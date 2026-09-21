@@ -86,17 +86,23 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -DCMAKE_SYSTEM_PROCESSOR=amd64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_BUILD_TYPE=Release -DDynamicBinaryInstrument=OFF -DPlugin.SymbolResolver=OFF -B build64
-          
+          cmake -DCMAKE_SYSTEM_PROCESSOR=amd64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_BUILD_TYPE=Release -DDynamicBinaryInstrument=OFF -DPlugin.SymbolResolver=OFF -B build64
+          cmake -DCMAKE_SYSTEM_PROCESSOR=arm64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_BUILD_TYPE=Release -DDynamicBinaryInstrument=OFF -DPlugin.SymbolResolver=OFF -B buildarm64
+
       - name: Build x64
         run: |
           cd build64 && make dobby
-          
+
+      - name: Build arm64
+        run: |
+          cd buildarm64 && make dobby
+
       - name: Collect artifacts
         run: |
           mkdir build_result
           cp build64/libdobby.dylib build_result/libdobby_x64.dylib
-          
+          cp buildarm64/libdobby.dylib build_result/libdobby_arm64.dylib
+
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
